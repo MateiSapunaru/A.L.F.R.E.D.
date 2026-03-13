@@ -1,0 +1,31 @@
+[project]
+name = "alfred"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "MateiSapunaru",email = "sapunarumatei@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi (>=0.135.1,<0.136.0)",
+    "uvicorn (>=0.41.0,<0.42.0)",
+    "ollama (>=0.6.1,<0.7.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)",
+    "pymongo (>=4.16.0,<5.0.0)",
+    "sentence-transformers (>=5.2.3,<6.0.0)",
+    "openai-whisper (>=20250625,<20250626)",
+    "sounddevice (>=0.5.5,<0.6.0)",
+    "soundfile (>=0.13.1,<0.14.0)",
+    "numpy (>=2.4.3,<3.0.0)",
+    "setuptools (>=82.0.1,<83.0.0)",
+    "keyboard (>=0.13.5,<0.14.0)",
+    "requests (>=2.32.5,<3.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "alfred", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
