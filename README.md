@@ -67,9 +67,9 @@ poetry install
 
 **Create your `.env`:**
 ```env
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/alfredDB
-PIPER_EXE=D:\piper\piper.exe
-PIPER_VOICE=D:\piper\voices\en_GB-northern_english_male-medium.onnx
+MONGODB_URI=<example>
+PIPER_EXE=<example>
+PIPER_VOICE=<example>
 ```
 
 **Set up the vector search index in Atlas:**
