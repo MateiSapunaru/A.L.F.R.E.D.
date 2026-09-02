@@ -3,9 +3,12 @@ import os
 
 load_dotenv()
 
-# Ollama / LLM
-OLLAMA_MODEL = "mistral-nemo"
-OLLAMA_URL = "http://localhost:11434"
+# Gemini / LLM
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+
+if not GEMINI_API_KEY:
+    raise RuntimeError("GEMINI_API_KEY must be set in your .env — see README setup.")
 
 # MongoDB
 MONGODB_URI = os.getenv("MONGODB_URI")

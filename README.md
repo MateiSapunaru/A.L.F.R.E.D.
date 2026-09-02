@@ -1,6 +1,6 @@
 # A.L.F.R.E.D.
 
-A locally-running AI assistant I built to learn how modern AI stacks fit together. Think JARVIS but on a budget and without the Iron Man suit. It runs entirely on my own hardware, remembers things across conversations, and talks back in a British accent.
+A voice assistant I built to learn how modern AI stacks fit together. Think JARVIS but on a budget and without the Iron Man suit. Speech recognition, text-to-speech, and memory embeddings all run locally on my own hardware; the LLM call goes out to Google's Gemini API (free tier), which gave more consistent response times than local Ollama inference on this machine. It remembers things across conversations and talks back in a British accent.
 
 Named after Alfred Pennyworth, obviously.
 
@@ -11,7 +11,7 @@ Named after Alfred Pennyworth, obviously.
 - You press a hotkey, talk, and it responds out loud
 - It remembers what you've told it across sessions — not just the last conversation
 - When you say something like "my name is John" or "I work in tech", it stores that and recalls it when relevant
-- Runs 100% locally. No API calls to OpenAI, no subscription fees, nothing leaves your machine except MongoDB data
+- Speech recognition, text-to-speech, and embeddings run locally — only the chat message and memory context are sent to Gemini's API for the LLM call
 
 ---
 
@@ -19,7 +19,7 @@ Named after Alfred Pennyworth, obviously.
 
 | | |
 |---|---|
-| LLM | Mistral Nemo via Ollama |
+| LLM | Gemini 3.6 Flash (Google AI API, free tier) |
 | Speech recognition | OpenAI Whisper (local) |
 | Text to speech | Piper TTS |
 | Backend | FastAPI |
@@ -38,13 +38,14 @@ I went with MongoDB for everything — conversations, preferences, and vector me
 alfred/
 ├── src/alfred/
 │   ├── main.py        # FastAPI app and endpoints
-│   ├── brain.py       # Ollama interface, personality prompt, memory injection
+│   ├── brain.py       # Gemini interface, personality prompt, memory injection
 │   ├── memory.py      # Save/search memories, conversation history, preferences
 │   ├── database.py    # MongoDB connection
 │   ├── ears.py        # Whisper recording and transcription
 │   ├── voice.py       # Piper TTS playback
 │   └── config.py      # Settings and env vars
 ├── hotkey.py          # Global push-to-talk listener
+├── streamlit_app.py   # Text/voice chat UI
 ├── .env
 └── pyproject.toml
 ```
@@ -55,10 +56,10 @@ alfred/
 
 You'll need:
 - Python 3.11+
-- [Ollama](https://ollama.com) — `ollama pull mistral-nemo`
+- A free [Gemini API key](https://aistudio.google.com/apikey) from Google AI Studio
 - [FFmpeg](https://www.gyan.dev/ffmpeg/builds/) on your PATH
 - [Piper TTS](https://github.com/rhasspy/piper/releases) — grab the Windows binary and a voice model from the [samples page](https://rhasspy.github.io/piper-samples/)
-- A free [MongoDB Atlas](https://mongodb.com/atlas) cluster
+- A free [MongoDB Atlas](https://mongodb.com/atlas) cluster — remember to add your IP to Atlas's Network Access list, or the app can't reach the database
 
 **Install dependencies:**
 ```bash
@@ -70,6 +71,7 @@ poetry install
 MONGODB_URI=<example>
 PIPER_EXE=<example>
 PIPER_VOICE=<example>
+GEMINI_API_KEY=<example>
 ```
 
 **Set up the vector search index in Atlas:**
@@ -110,6 +112,11 @@ Press **T** to talk. Alfred listens for 5 seconds then responds.
 
 The API is at `http://localhost:8000` — Swagger docs at `/docs` if you want to poke around.
 
+There's also a small Streamlit UI for chatting with Alfred over text (and triggering voice mode) without needing the hotkey:
+```bash
+poetry run streamlit run streamlit_app.py
+```
+
 ---
 
 ## API
@@ -137,4 +144,4 @@ The API is at `http://localhost:8000` — Swagger docs at `/docs` if you want to
 
 ## Hardware
 
-Built and tested on Windows 11 with an RTX 4070 12GB. Mistral Nemo runs comfortably on the GPU via Ollama. Whisper uses the `base` model which is fast enough for real-time use.
+Built and tested on Windows 11 with an RTX 4070 12GB. Whisper uses the `base` model which is fast enough for real-time use on CPU or GPU.

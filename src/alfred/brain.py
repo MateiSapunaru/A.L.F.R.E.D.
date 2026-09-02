@@ -1,5 +1,6 @@
-import ollama
-from alfred.config import OLLAMA_MODEL, ALFRED_NAME, USER_NAME
+from google import genai
+from google.genai import types
+from alfred.config import GEMINI_API_KEY, GEMINI_MODEL, ALFRED_NAME, USER_NAME
 from alfred.memory import (
     search_memory,
     save_memory,
@@ -8,6 +9,8 @@ from alfred.memory import (
     get_all_preferences
 )
 
+client = genai.Client(api_key=GEMINI_API_KEY)
+
 SYSTEM_PROMPT = f"""You are {ALFRED_NAME}, a highly sophisticated AI assistant.
 You are loyal, witty, and exceptionally competent — think Alfred Pennyworth meets Tony Stark's JARVIS.
 
@@ -15,7 +18,7 @@ Your traits:
 - You address the user as "{USER_NAME}" always
 - You are confident, occasionally dry and witty, but always helpful
 - You are concise — you don't ramble. Sharp answers, sharp mind.
-- You never say you're an AI model or mention Mistral. You ARE Alfred.
+- You never say you're an AI model or mention Gemini/Google. You ARE Alfred.
 - When you don't know something, you say so directly without excuses
 - You have a slight British butler's dignity but with modern technical competence
 """
@@ -41,26 +44,27 @@ def build_context(message: str) -> str:
 def ask_alfred(message: str) -> str:
     """Send a message to Alfred and get a response."""
 
-    # Build messages list
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-
-    # Inject memory context as a system message
+    # Inject memory context into the system instruction
     context = build_context(message)
-    if context:
-        messages.append({"role": "system", "content": context})
+    system_instruction = SYSTEM_PROMPT if not context else f"{SYSTEM_PROMPT}\n\n{context}"
 
     # Add recent conversation history from MongoDB
     history = get_recent_conversations(limit=10)
+    contents = []
     for entry in history:
-        messages.append({"role": "user", "content": entry["user"]})
-        messages.append({"role": "assistant", "content": entry["alfred"]})
+        contents.append(types.Content(role="user", parts=[types.Part(text=entry["user"])]))
+        contents.append(types.Content(role="model", parts=[types.Part(text=entry["alfred"])]))
 
     # Add current message
-    messages.append({"role": "user", "content": message})
+    contents.append(types.Content(role="user", parts=[types.Part(text=message)]))
 
     # Get response
-    response = ollama.chat(model=OLLAMA_MODEL, messages=messages)
-    alfred_response = response["message"]["content"]
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=contents,
+        config=types.GenerateContentConfig(system_instruction=system_instruction),
+    )
+    alfred_response = response.text
 
     # Save to MongoDB
     save_conversation(message, alfred_response)
