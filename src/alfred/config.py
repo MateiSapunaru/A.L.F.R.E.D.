@@ -22,6 +22,11 @@ ALFRED_NAME = "Alfred"
 USER_NAME = "Sir"
 
 # Voice
-PIPER_EXE = os.getenv("PIPER_EXE", r"D:\piper\piper.exe")
-PIPER_VOICE = os.getenv("PIPER_VOICE", r"D:\piper\voices\en_GB-northern_english_male-medium.onnx")
+PIPER_EXE = os.getenv("PIPER_EXE")
+PIPER_VOICE = os.getenv("PIPER_VOICE")
+
+if not PIPER_EXE or not PIPER_VOICE:
+    raise RuntimeError(
+        "PIPER_EXE and PIPER_VOICE must be set in your .env — see README setup."
+    )
 
