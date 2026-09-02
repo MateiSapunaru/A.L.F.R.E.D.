@@ -106,7 +106,7 @@ Start the hotkey listener in a second terminal:
 poetry run python hotkey.py
 ```
 
-Hold **numpad Enter** to talk. Alfred listens for 5 seconds then responds.
+Press **T** to talk. Alfred listens for 5 seconds then responds.
 
 The API is at `http://localhost:8000` — Swagger docs at `/docs` if you want to poke around.
 

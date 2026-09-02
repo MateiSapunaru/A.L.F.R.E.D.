@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from pydantic import BaseModel
 from alfred.brain import ask_alfred
@@ -6,7 +7,15 @@ from alfred.memory import save_preference, get_all_preferences, save_memory, sea
 from alfred.ears import listen
 from alfred.voice import speak
 
-app = FastAPI(title="Alfred", description="Your personal AI assistant")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if ping():
+        print("Alfred is online. MongoDB connected.")
+    else:
+        print("Warning: MongoDB connection failed.")
+    yield
+
+app = FastAPI(title="Alfred", description="Your personal AI assistant", lifespan=lifespan)
 
 class Message(BaseModel):
     text: str
@@ -14,13 +23,6 @@ class Message(BaseModel):
 class Preference(BaseModel):
     key: str
     value: str
-
-@app.on_event("startup")
-def startup():
-    if ping():
-        print("Alfred is online. MongoDB connected.")
-    else:
-        print("Warning: MongoDB connection failed.")
 
 @app.get("/")
 def root():

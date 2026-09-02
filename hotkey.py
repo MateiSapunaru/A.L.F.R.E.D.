@@ -22,10 +22,10 @@ def on_press():
     thread.daemon = True
     thread.start()
 
-print("🎩 Alfred hotkey active — hold RIGHT ENTER to speak")
+print("🎩 Alfred hotkey active — press T to speak")
 print("Press Ctrl+C to quit\n")
 
-# Trigger on right enter press
-keyboard.add_hotkey("T", on_press, trigger_on_release=False)  # This way it triggers immediately on press, not release
+# Trigger on key press, not release, so there's no delay
+keyboard.add_hotkey("T", on_press, trigger_on_release=False)
 
 keyboard.wait("esc")  # Keep script running until ESC is pressed
