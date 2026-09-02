@@ -5,6 +5,7 @@ import types
 os.environ.setdefault("MONGODB_URI", "mongodb://localhost:27017")
 os.environ.setdefault("PIPER_EXE", "piper.exe")
 os.environ.setdefault("PIPER_VOICE", "voice.onnx")
+os.environ.setdefault("GEMINI_API_KEY", "test-key")
 
 # Stub sentence_transformers so tests never load the real embedding model
 # (avoids a multi-hundred-MB download / GPU dependency just to run unit tests).
